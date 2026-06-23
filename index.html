@@ -528,7 +528,7 @@
 
             <div class="form-group">
                 <label><i class="fas fa-home"></i> Direction / Location</label>
-                <input type="text" id="location" placeholder="e.g. Near Kyabenda Primary, 200m from borehole" />
+                <input type="text" id="location" placeholder="e.g. Near Kyahenda Primary, 200m from borehole" />
             </div>
 
             <div class="form-group">
@@ -1179,17 +1179,7 @@
             }
         }
 
-        /**
-         * Deletes all data from Firestore
-         */
-        async function clearFirestoreData() {
-            if (!confirm('⚠️ Delete ALL data from Firestore? This cannot be undone.')) {
-                return;
-            }
-
-            if (!confirm('Are you absolutely sure? ALL household records will be deleted from the cloud.')) {
-                return;
-            }
+       
 
             if (!navigator.onLine) {
                 alert('You are offline. Connect to the internet and try again.');
