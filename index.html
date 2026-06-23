@@ -448,8 +448,8 @@
     </style>
 </head>
 <body>
-  
- <!-- ===== HEADER ===== -->
+
+       <!-- ===== HEADER ===== -->
     <div class="header">
         <h1><i class="fas fa-leaf"></i> BMD Notebook</h1>
         <div class="sub">Byamukama Mentor – Buhweju Must Develop</div>
@@ -585,7 +585,7 @@
         </div>
         <div id="resultsList"></div>
     </div>
-    
+
     <!-- ===== SYNC STATUS ===== -->
     <div class="sync-status" id="syncStatus">
         <span class="synced"><i class="fas fa-check-circle"></i> Data saved locally</span>
@@ -593,7 +593,17 @@
 
     <!-- ========================================================================= -->
     <!-- ===== JAVASCRIPT ===== -->
-    <script>
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
+                "firebase/analytics": "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"
+            }
+        }
+    </script>
+
+        <script type="module">
         // ============================================================
         // 1. CONFIGURATION & DATA
         // ============================================================
@@ -624,10 +634,28 @@
         }
 
         // ============================================================
-        // 2. FIREBASE CONFIG (Your provided config)
+        // 2. FIREBASE IMPORTS & CONFIG
         // ============================================================
-        // Note: Firebase will only work when online.
-        // We'll implement a simple sync that works when online.
+
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, collection, doc, setDoc, getDocs, writeBatch } from "firebase/firestore";
+        import { getAnalytics } from "firebase/analytics";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsnwTnJh-9_6sosc7tqX_LxpCalEPq8D0",
+            authDomain: "buhweju-must-develop.firebaseapp.com",
+            projectId: "buhweju-must-develop",
+            storageBucket: "buhweju-must-develop.firebasestorage.app",
+            messagingSenderId: "441477791044",
+            appId: "1:441477791044:web:b88b1ffbc021ac1a37eb11",
+            measurementId: "G-Q0V68S4DNR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
+
+        console.log('🔥 Firebase initialized – collections will be created automatically');
 
         // ============================================================
         // 3. LOCAL STORAGE – PRIMARY DATABASE
@@ -635,7 +663,6 @@
 
         const STORAGE_KEY = 'bmd_notebook_data';
 
-        // Helper: Get all records from localStorage
         function getRecords() {
             try {
                 const data = localStorage.getItem(STORAGE_KEY);
@@ -645,12 +672,10 @@
             }
         }
 
-        // Helper: Save records to localStorage
         function saveRecords(records) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
         }
 
-        // Helper: Generate unique ID (based on phone + timestamp)
         function generateId(phone) {
             return phone + '_' + Date.now();
         }
@@ -661,18 +686,15 @@
 
         function addRecord(record) {
             const records = getRecords();
-            // Check if phone already exists
             const existing = records.find(r => r.phone === record.phone);
             if (existing) {
-                // Update existing record
                 Object.assign(existing, record);
                 saveRecords(records);
                 return { success: true, updated: true };
             }
-            // New record
             record.id = generateId(record.phone);
             record.createdAt = new Date().toISOString();
-            records.unshift(record); // newest first
+            records.unshift(record);
             saveRecords(records);
             return { success: true, updated: false };
         }
@@ -687,10 +709,6 @@
         function getRecordByPhone(phone) {
             const records = getRecords();
             return records.find(r => r.phone === phone) || null;
-        }
-
-        function getAllRecords() {
-            return getRecords();
         }
 
         // ============================================================
@@ -730,28 +748,22 @@
             const total = records.length;
             const today = new Date().toDateString();
 
-            // Total people
             document.getElementById('totalPeople').textContent = total;
 
-            // BMD members
             const bmdCount = records.filter(r => r.joinBmd === 'yes' || r.joinBmd === 'already').length;
             document.getElementById('bmdMembers').textContent = bmdCount;
 
-            // Parish count
             const parishes = new Set(records.map(r => r.parish).filter(Boolean));
             document.getElementById('totalParishes').textContent = parishes.size;
 
-            // Today's entries
             const todayCount = records.filter(r => {
                 if (!r.createdAt) return false;
                 return new Date(r.createdAt).toDateString() === today;
             }).length;
             document.getElementById('todayCount').textContent = todayCount;
 
-            // Total record count in header
             document.getElementById('recordCount').textContent = total;
 
-            // Parish breakdown
             updateParishStats(records);
         }
 
@@ -810,15 +822,15 @@
                             ${r.createdAt ? `<span class="tag" style="background:#eee;color:#666;font-weight:400;">${new Date(r.createdAt).toLocaleDateString()}</span>` : ''}
                         </div>
                         <div class="actions">
-                            <button class="edit" onclick="editRecord('${r.phone}')"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="delete" onclick="deleteRecordUI('${r.phone}')"><i class="fas fa-trash"></i> Delete</button>
+                            <button class="edit" onclick="window.editRecord('${r.phone}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="delete" onclick="window.deleteRecordUI('${r.phone}')"><i class="fas fa-trash"></i> Delete</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // ============================================================
+// ============================================================
         // 7. FORM HANDLING
         // ============================================================
 
@@ -834,7 +846,6 @@
             }
         }
 
-        // Auto-fill subcounty when parish is selected
         document.getElementById('parish').addEventListener('change', function() {
             const sub = PARISH_TO_SUBCOUNTY[this.value] || '';
             document.getElementById('subcounty').value = sub;
@@ -857,7 +868,7 @@
             document.getElementById('phone').focus();
         }
 
-        function editRecord(phone) {
+        window.editRecord = function(phone) {
             const record = getRecordByPhone(phone);
             if (!record) return;
 
@@ -877,24 +888,22 @@
             document.getElementById('formContainer').classList.add('active');
             document.getElementById('phone').focus();
 
-            // Scroll to form
             document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
-        }
+        };
 
-        function deleteRecordUI(phone) {
+        window.deleteRecordUI = function(phone) {
             if (!confirm('Delete this record permanently?')) return;
             deleteRecord(phone);
             updateDashboard();
-            // Refresh current view
             const query = document.getElementById('searchInput').value;
             performSearch(query);
-        }
+        };
 
         // ============================================================
         // 8. FORM SUBMIT
         // ============================================================
 
-        document.getElementById('entryForm').addEventListener('submit', function(e) {
+        document.getElementById('entryForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const phone = document.getElementById('phone').value.trim();
@@ -917,18 +926,11 @@
 
             const result = addRecord(record);
 
-            if (result.updated) {
-                // Check if phone changed (but phone is primary key)
-                // We handle updates properly
-            }
-
             resetForm();
             updateDashboard();
-            // Refresh current view
             const query = document.getElementById('searchInput').value;
             performSearch(query);
 
-            // Show feedback
             const btn = document.getElementById('submitBtn');
             const original = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
@@ -936,9 +938,18 @@
                 btn.innerHTML = original;
             }, 1500);
 
-            // If online, attempt sync
+            // Auto-sync to Firestore if online
             if (navigator.onLine) {
-                syncToFirebase();
+                try {
+                    const syncResult = await saveToFirestore(record);
+                    if (syncResult.success) {
+                        console.log('✅ Auto-synced to Firestore:', record.name);
+                        const status = document.getElementById('syncStatus');
+                        status.innerHTML = `<span class="synced"><i class="fas fa-cloud-upload-alt"></i> Synced: ${record.name}</span>`;
+                    }
+                } catch (error) {
+                    console.log('Auto-sync skipped:', error.message);
+                }
             }
         });
 
@@ -976,7 +987,7 @@
         // ============================================================
         // 10. EXPORT DATA
         // ============================================================
-
+        
         document.getElementById('exportBtn').addEventListener('click', function() {
             const records = getRecords();
             if (records.length === 0) {
@@ -984,7 +995,6 @@
                 return;
             }
 
-            // Create CSV
             const headers = ['Phone', 'Name', 'Parish', 'Subcounty', 'Location', 'Neighbor', 'Response', 'Comment',
                 'JoinBMD', 'CreatedAt'
             ];
@@ -1003,7 +1013,6 @@
 
             const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
 
-            // Download
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -1049,66 +1058,205 @@
         window.addEventListener('offline', updateOfflineStatus);
 
         // ============================================================
-        // 13. FIREBASE SYNC
+        // 13. FIREBASE SYNC – FULL IMPLEMENTATION
         // ============================================================
 
-        // Note: Firebase sync is optional and requires internet.
-        // This implementation stores data in local
-        
-         // When online, we attempt to sync to Firebase.
-
-        function syncToFirebase() {
+        /**
+         * Saves a record to Firestore.
+         * Creates the 'households' collection and all fields automatically.
+         */
+        async function saveToFirestore(record) {
             if (!navigator.onLine) {
-                console.log('Offline – cannot sync to Firebase');
-                return;
+                console.log('Offline – data will sync later');
+                return { success: false, reason: 'offline' };
             }
 
-            const records = getRecords();
-            if (records.length === 0) return;
+            try {
+                const docId = record.phone.replace(/[^0-9]/g, '');
+                if (!docId) {
+                    console.error('No valid phone number for Firestore ID');
+                    return { success: false, reason: 'invalid phone' };
+                }
 
-            // We'll use Firebase Realtime Database or Firestore
-            // For now, we'll simulate sync by showing a status message
-            // In production, you would integrate Firebase SDK
+                const docRef = doc(db, 'households', docId);
 
-            console.log('Syncing to Firebase:', records);
+                const data = {
+                    phone: record.phone,
+                    name: record.name || '',
+                    parish: record.parish || '',
+                    subcounty: record.subcounty || '',
+                    location: record.location || '',
+                    neighbor: record.neighbor || '',
+                    response: record.response || '',
+                    comment: record.comment || '',
+                    joinBmd: record.joinBmd || 'maybe',
+                    updatedAt: new Date().toISOString(),
+                    ...(record.createdAt ? { createdAt: record.createdAt } : {})
+                };
 
-            // Show sync status
-            const status = document.getElementById('syncStatus');
-            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+                await setDoc(docRef, data, { merge: true });
 
-            // Simulate sync delay
-            setTimeout(() => {
-                status.innerHTML = '<span class="synced"><i class="fas fa-cloud-upload-alt"></i> Synced to Firebase</span>';
-                // Store last sync time
-                localStorage.setItem('bmd_last_sync', new Date().toISOString());
-            }, 1000);
-
-            // Note: To fully implement Firebase, you would:
-            // 1. Import firebase/app and firebase/database or firebase/firestore
-            // 2. Initialize with your config
-            // 3. Write records to Firebase
-            // 4. Handle conflicts if multiple devices
+                console.log(`✅ Saved to Firestore: ${record.name} (${record.phone})`);
+                return { success: true, docId: docId };
+            } catch (error) {
+                console.error('Firestore save error:', error);
+                return { success: false, reason: error.message };
+            }
         }
 
-        // Manually trigger sync
-        document.getElementById('syncBtn').addEventListener('click', function() {
+        /**
+         * Syncs all local records to Firestore
+         */
+        async function syncAllToFirestore() {
             if (!navigator.onLine) {
-                alert('You are offline. Data will sync automatically when you have internet.');
+                alert('You are offline. Connect to the internet and try again.');
                 return;
             }
-            syncToFirebase();
-        });
 
-        // Auto-sync when online and data exists
-        window.addEventListener('online', function() {
             const records = getRecords();
-            if (records.length > 0) {
-                syncToFirebase();
+            if (records.length === 0) {
+                alert('No records to sync.');
+                return;
             }
-        });
+
+            const status = document.getElementById('syncStatus');
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing ' + records.length + ' records...';
+
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const record of records) {
+                const result = await saveToFirestore(record);
+                if (result.success) {
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            }
+
+            localStorage.setItem('bmd_last_sync', new Date().toISOString());
+
+            status.innerHTML = `<span class="synced"><i class="fas fa-cloud-upload-alt"></i> Synced: ${successCount} records. Failed: ${failCount}</span>`;
+
+            alert(`Sync complete!\n✅ Success: ${successCount}\n❌ Failed: ${failCount}\n\nCheck console for details.`);
+
+            return { success: successCount, failed: failCount };
+        }
+
+        /**
+         * Loads all records from Firestore into local storage
+         */
+        async function loadFromFirestore() {
+            if (!navigator.onLine) {
+                alert('You are offline. Connect to the internet and try again.');
+                return;
+            }
+
+            try {
+                const householdsRef = collection(db, 'households');
+                const snapshot = await getDocs(householdsRef);
+
+                if (snapshot.empty) {
+                    alert('No records found in Firestore.');
+                    return;
+                }
+
+                let records = [];
+                snapshot.forEach(doc => {
+                    records.push(doc.data());
+                });
+
+                saveRecords(records);
+                updateDashboard();
+                performSearch('');
+
+                alert(`✅ Loaded ${records.length} records from Firestore to local storage.`);
+
+                return records;
+            } catch (error) {
+                console.error('Load from Firestore error:', error);
+                alert('Error loading from Firestore: ' + error.message);
+            }
+        }
+
+        /**
+         * Deletes all data from Firestore
+         */
+        async function clearFirestoreData() {
+            if (!confirm('⚠️ Delete ALL data from Firestore? This cannot be undone.')) {
+                return;
+            }
+
+            if (!confirm('Are you absolutely sure? ALL household records will be deleted from the cloud.')) {
+                return;
+            }
+
+            if (!navigator.onLine) {
+                alert('You are offline. Connect to the internet and try again.');
+                return;
+            }
+
+            try {
+                const householdsRef = collection(db, 'households');
+                const snapshot = await getDocs(householdsRef);
+
+                if (snapshot.empty) {
+                    alert('Firestore is already empty.');
+                    return;
+                }
+
+                const batch = writeBatch(db);
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+
+                alert(`✅ Deleted ${snapshot.size} records from Firestore.`);
+            } catch (error) {
+                console.error('Clear Firestore error:', error);
+                alert('Error clearing Firestore: ' + error.message);
+            }
+        }
 
         // ============================================================
-        // 14. INITIALIZATION
+        // 14. UPDATE SYNC BUTTON & ADD CLOUD BUTTONS
+        // ============================================================
+
+        document.getElementById('syncBtn').addEventListener('click', function() {
+            syncAllToFirestore();
+        });
+
+        // Add "Load from Cloud" and "Clear Cloud" buttons dynamically
+        (function addFirebaseButtons() {
+            const actionBar = document.querySelector('.action-bar');
+            if (!actionBar) return;
+
+            if (document.getElementById('loadFromCloudBtn')) return;
+
+            const loadBtn = document.createElement('button');
+            loadBtn.id = 'loadFromCloudBtn';
+            loadBtn.className = 'btn btn-outline';
+            loadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Load from Cloud';
+            loadBtn.style.marginLeft = '4px';
+            loadBtn.addEventListener('click', loadFromFirestore);
+
+            const clearBtn = document.createElement('button');
+            clearBtn.id = 'clearCloudBtn';
+            clearBtn.className = 'btn btn-outline';
+            clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear Cloud';
+            clearBtn.style.marginLeft = '4px';
+            clearBtn.style.borderColor = '#c0392b';
+            clearBtn.style.color = '#c0392b';
+            clearBtn.addEventListener('click', clearFirestoreData);
+
+            actionBar.appendChild(loadBtn);
+            actionBar.appendChild(clearBtn);
+        })();
+
+ 
+        // ============================================================
+        // 15. INITIALIZATION
         // ============================================================
 
         function init() {
@@ -1116,10 +1264,8 @@
             updateDashboard();
             updateOfflineStatus();
 
-            // Show all records by default
             performSearch('');
 
-            // Show last sync time if available
             const lastSync = localStorage.getItem('bmd_last_sync');
             if (lastSync) {
                 const status = document.getElementById('syncStatus');
@@ -1127,22 +1273,18 @@
                     `<span class="synced"><i class="fas fa-cloud-upload-alt"></i> Last synced: ${new Date(lastSync).toLocaleString()}</span>`;
             }
 
-            console.log('BMD Notebook initialized. Total records:', getRecords().length);
+            console.log('🌿 BMD Notebook initialized. Total records:', getRecords().length);
+            console.log('🔥 Firebase ready. Collections: "households"');
+            console.log('📱 Offline-first. Data saved locally. Syncs when online.');
         }
 
-        // Run on load
         document.addEventListener('DOMContentLoaded', init);
 
-        // ============================================================
-        // 15. SERVICE WORKER FOR OFFLINE (Optional)
-        // ============================================================
-        // To enable full offline support (page loads even without internet),
-        // you would register a Service Worker. For simplicity, this app
-        // works because the HTML and JS are loaded once and then
-        // localStorage handles data persistence.
+        // Expose functions to global scope for inline onclick handlers
+        window.editRecord = editRecord;
+        window.deleteRecordUI = deleteRecordUI;
 
-        console.log('BMD Notebook ready – offline-first data collection');
-        console.log('Built for Buhweju Must Develop – Byamukama Mentor');
+        console.log('📋 BMD Notebook ready – built for Buhweju Must Develop');
     </script>
 </body>
 </html>
