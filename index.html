@@ -1220,40 +1220,32 @@
             }
         }
 
-        // ============================================================
-        // 14. UPDATE SYNC BUTTON & ADD CLOUD BUTTONS
-        // ============================================================
+        
 
-        document.getElementById('syncBtn').addEventListener('click', function() {
-            syncAllToFirestore();
-        });
+          // ============================================================
+// 14. UPDATE SYNC BUTTON & ADD CLOUD BUTTONS
+// ============================================================
 
-        // Add "Load from Cloud" and "Clear Cloud" buttons dynamically
-        (function addFirebaseButtons() {
-            const actionBar = document.querySelector('.action-bar');
-            if (!actionBar) return;
+document.getElementById('syncBtn').addEventListener('click', function() {
+    syncAllToFirestore();
+});
 
-            if (document.getElementById('loadFromCloudBtn')) return;
+// Add "Load from Cloud" button only
+(function addFirebaseButtons() {
+    const actionBar = document.querySelector('.action-bar');
+    if (!actionBar) return;
 
-            const loadBtn = document.createElement('button');
-            loadBtn.id = 'loadFromCloudBtn';
-            loadBtn.className = 'btn btn-outline';
-            loadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Load from Cloud';
-            loadBtn.style.marginLeft = '4px';
-            loadBtn.addEventListener('click', loadFromFirestore);
+    if (document.getElementById('loadFromCloudBtn')) return;
 
-            const clearBtn = document.createElement('button');
-            clearBtn.id = 'clearCloudBtn';
-            clearBtn.className = 'btn btn-outline';
-            clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Clear Cloud';
-            clearBtn.style.marginLeft = '4px';
-            clearBtn.style.borderColor = '#c0392b';
-            clearBtn.style.color = '#c0392b';
-            clearBtn.addEventListener('click', clearFirestoreData);
+    const loadBtn = document.createElement('button');
+    loadBtn.id = 'loadFromCloudBtn';
+    loadBtn.className = 'btn btn-outline';
+    loadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Load from Cloud';
+    loadBtn.style.marginLeft = '4px';
+    loadBtn.addEventListener('click', loadFromFirestore);
 
-            actionBar.appendChild(loadBtn);
-            actionBar.appendChild(clearBtn);
-        })();
+    actionBar.appendChild(loadBtn);
+})();
 
  
         // ============================================================
