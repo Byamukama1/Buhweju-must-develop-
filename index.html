@@ -1179,7 +1179,18 @@
             }
         }
 
-       
+               /**
+         * Deletes all data from Firestore
+         */
+        async function clearFirestoreData() {
+            if (!confirm('⚠️ Delete ALL data from Firestore? This cannot be undone.')) {
+                return;
+            }
+
+            if (!confirm('Are you absolutely sure? ALL household records will be deleted from the cloud.')) {
+                return;
+            }
+
 
             if (!navigator.onLine) {
                 alert('You are offline. Connect to the internet and try again.');
