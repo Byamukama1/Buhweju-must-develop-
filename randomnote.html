@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Random Notes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            color: #1e1e1e;
+            padding-bottom: 30px;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            color: white;
+            padding: 20px 16px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        header h2 i {
+            font-size: 24px;
+        }
+
+        header .sub {
+            font-size: 12px;
+            opacity: 0.8;
+            text-align: center;
+            margin-top: 4px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            padding: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .action-bar .btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .action-bar .btn:active { transform: scale(0.97); }
+
+        .btn-add { background: #2e7d32; }
+        .btn-add:hover { background: #1b5e20; }
+
+        .btn-sync { background: #1565c0; }
+        .btn-sync:hover { background: #0d47a1; }
+
+        .btn-outline {
+            background: white;
+            color: #1e1e1e;
+            border: 1.5px solid #ddd;
+            flex: 0 0 auto !important;
+            min-width: auto !important;
+            padding: 12px 16px;
+        }
+        .btn-outline:hover { background: #f5f5f5; }
+
+        /* ===== SEARCH ===== */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+        }
+
+        #search {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        #search:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        /* ===== FORM ===== */
+        #formBox {
+            background: white;
+            padding: 18px 16px;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            border: 1px solid #e8e8e8;
+        }
+
+        #formBox.hidden { display: none; }
+
+        #formBox h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1b5e20;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        #formBox input,
+        #formBox select,
+        #formBox textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: #fafafa;
+            transition: border-color 0.2s;
+        }
+
+        #formBox input:focus,
+        #formBox select:focus,
+        #formBox textarea:focus {
+            outline: none;
+            border-color: #2e7d32;
+            background: white;
+        }
+
+        #formBox textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .form-actions .btn:active { transform: scale(0.97); }
+
+        .btn-save { background: #2e7d32; }
+        .btn-save:hover { background: #1b5e20; }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .btn-cancel:hover { background: #ccc; }
+
+        /* ===== NOTES LIST ===== */
+        #notesList {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .note-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border-left: 5px solid #2e7d32;
+            transition: all 0.2s;
+        }
+
+        .note-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .note-card .title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e1e1e;
+            margin-bottom: 4px;
+        }
+
+        .note-card .meta {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            margin-bottom: 8px;
+        }
+
+        .note-card .meta .category {
+            background: #f0f2f5;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 11px;
+        }
+
+        .note-card .meta .priority {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .note-card .body {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .note-card .timestamps {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .note-card .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .note-card .actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .note-card .actions button:active { transform: scale(0.95); }
+
+        .btn-edit {
+            background: #f9a825;
+            color: #1e1e1e;
+        }
+        .btn-edit:hover { background: #f57f17; }
+
+        .btn-delete {
+            background: #c62828;
+            color: white;
+        }
+        .btn-delete:hover { background: #b71c1c; }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ===== OFFLINE BANNER ===== */
+        .offline-banner {
+            background: #ff6f00;
+            color: white;
+            text-align: center;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .offline-banner.show { display: block; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .form-row { grid-template-columns: 1fr; }
+            .action-bar .btn { min-width: 80px; font-size: 13px; padding: 10px 12px; }
+            header h2 { font-size: 18px; }
+            .note-card { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== OFFLINE BANNER ===== -->
+    <div class="offline-banner" id="offlineBanner">
+        <i class="fas fa-wifi-slash"></i> You are offline – notes saved locally. Sync when online.
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <h2><i class="fas fa-leaf"></i> BMD Notes</h2>
+        <div class="sub">Byamukama Mentor – Buhweju Must Develop</div>
+    </header>
+
+    <!-- ===== CONTAINER ===== -->
+    <div class="container">
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn btn-add" onclick="showForm()">
+                <i class="fas fa-plus-circle"></i> New Note
+            </button>
+            <button class="btn btn-sync" onclick="syncNow()">
+                <i class="fas fa-cloud-upload-alt"></i> Sync
+            </button>
+            <button class="btn btn-outline" onclick="renderNotes()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search" placeholder="Search notes by title or content..." oninput="renderNotes()">
+        </div>
+
+        <!-- ===== FORM ===== -->
+        <div id="formBox" class="hidden">
+            <h3><i class="fas fa-pen"></i> <span id="formTitle">New Note</span></h3>
+
+            <input type="hidden" id="noteId">
+
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Title</label>
+                <input type="text" id="title" placeholder="Enter title...">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Category</label>
+                    <select id="category">
+                        <option>💡 Idea</option>
+                        <option>✅ Task</option>
+                        <option>📌 Remember</option>
+                        <option>📞 Contact</option>
+                        <option>🏛 Politics</option>
+                        <option>📅 Meeting</option>
+                        <option>💰 Finance</option>
+                        <option>📖 Quote</option>
+                        <option>📚 Study</option>
+                        <option>❤️ Personal</option>
+                        <option>📍 Visit</option>
+                        <option>📂 Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-flag"></i> Priority</label>
+                    <select id="priority">
+                        <option>🟢 Low</option>
+                        <option>🟡 Medium</option>
+                        <option>🔴 High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-file-alt"></i> Note</label>
+                <textarea id="note" rows="4" placeholder="Write your note here..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-save" onclick="saveNote()"><i class="fas fa-save"></i> Save</button>
+                <button class="btn btn-cancel" onclick="hideForm()"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+
+        <!-- ===== NOTES LIST ===== -->
+        <div id="notesList"></div>
+
+    </div>
+
+    <!-- ===== FIREBASE ===== -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsnwTnJh-9_6sosc7tqX_LxpCalEPq8D0",
+            authDomain: "buhweju-must-develop.firebaseapp.com",
+            projectId: "buhweju-must-develop",
+            storageBucket: "buhweju-must-develop.firebasestorage.app",
+            messagingSenderId: "441477791044",
+            appId: "1:441477791044:web:b88b1ffbc021ac1a37eb11",
+            measurementId: "G-Q0V68S4DNR"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ============================================================
+        // CONSTANTS
+        // ============================================================
+        const STORAGE_KEY = "bmd_notes";
+        const SYNC_KEY = "bmd_sync_queue";
+
+        // ============================================================
+        // LOCAL STORAGE
+        // ============================================================
+        function getNotes() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        }
+
+        function saveNotes(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function getSyncQueue() {
+            return JSON.parse(localStorage.getItem(SYNC_KEY) || "[]");
+        }
+
+        function saveSyncQueue(q) {
+            localStorage.setItem(SYNC_KEY, JSON.stringify(q));
+        }
+
+        // ============================================================
+        // OFFLINE DETECTION
+        // ============================================================
+        function updateOfflineStatus() {
+            const banner = document.getElementById('offlineBanner');
+            if (!navigator.onLine) {
+                banner.classList.add('show');
+            } else {
+                banner.classList.remove('show');
+            }
+        }
+
+        window.addEventListener('online', updateOfflineStatus);
+        window.addEventListener('offline', updateOfflineStatus);
+
+        // ============================================================
+        // UI HELPERS
+        // ============================================================
+        function showForm() {
+            document.getElementById("formBox").classList.remove("hidden");
+            document.getElementById("formTitle").textContent = "New Note";
+            document.getElementById("noteId").value = "";
+            document.getElementById("title").focus();
+        }
+
+        function hideForm() {
+            document.getElementById("formBox").classList.add("hidden");
+            clearForm();
+        }
+
+        function clearForm() {
+            document.getElementById("noteId").value = "";
+            document.getElementById("title").value = "";
+            document.getElementById("note").value = "";
+        }
+
+        // ============================================================
+        // SAVE NOTE
+        // ============================================================
+        function saveNote() {
+            let notes = getNotes();
+
+            let id = document.getElementById("noteId").value;
+            let title = document.getElementById("title").value.trim();
+            let category = document.getElementById("category").value;
+            let priority = document.getElementById("priority").value;
+            let text = document.getElementById("note").value.trim();
+
+            if (!title) {
+                alert("Please enter a title.");
+                return;
+            }
+
+            let now = new Date().toISOString();
+
+            if (id) {
+                // Edit existing
+                let note = notes.find(n => n.id === id);
+                if (note) {
+                    note.title = title;
+                    note.category = category;
+                    note.priority = priority;
+                    note.note = text;
+                    note.lastEdited = now;
+                }
+                saveNotes(notes);
+                // Add to sync queue
+                let queue = getSyncQueue();
+                if (!queue.includes(id)) {
+                    queue.push(id);
+                    saveSyncQueue(queue);
+                }
+            } else {
+                // New note
+                id = "note_" + Date.now();
+
+                notes.push({
+                    id,
+                    title,
+                    category,
+                    priority,
+                    note: text,
+                    dateCreated: now,
+                    lastEdited: now,
+                    synced: false,
+                    deleted: false
+                });
+
+                saveNotes(notes);
+
+                let queue = getSyncQueue();
+                queue.push(id);
+                saveSyncQueue(queue);
+            }
+
+            hideForm();
+            renderNotes();
+
+            // Auto-sync if online
+            if (navigator.onLine) {
+                setTimeout(syncNow, 500);
+            }
+        }
+
+        // ============================================================
+        // EDIT
+        // ============================================================
+        function editNote(id) {
+            let notes = getNotes();
+            let note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            document.getElementById("noteId").value = note.id;
+            document.getElementById("title").value = note.title;
+            document.getElementById("category").value = note.category;
+            document.getElementById("priority").value = note.priority;
+            document.getElementById("note").value = note.note;
+
+            document.getElementById("formTitle").textContent = "Edit Note";
+            document.getElementById("formBox").classList.remove("hidden");
+            document.getElementById("title").focus();
+        }
+
+        // ============================================================
+        // DELETE
+        // ============================================================
+        function deleteNote(id) {
+            if (!confirm("Delete this note permanently?")) return;
+
+            let notes = getNotes();
+            notes = notes.filter(n => n.id !== id);
+            saveNotes(notes);
+
+            // Also remove from sync queue
+            let queue = getSyncQueue();
+            queue = queue.filter(q => q !== id);
+            saveSyncQueue(queue);
+
+            renderNotes();
+        }
+
+        // ============================================================
+        // RENDER NOTES
+        // ============================================================
+        function renderNotes() {
+            let notes = getNotes();
+            let search = document.getElementById("search").value.toLowerCase();
+
+            let list = document.getElementById("notesList");
+
+            let filtered = notes
+                .filter(n => !n.deleted)
+                .filter(n =>
+                    n.title.toLowerCase().includes(search) ||
+                    n.note.toLowerCase().includes(search)
+                )
+                .sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited));
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>${search ? 'No notes match your search.' : 'No notes yet. Tap "New Note" to start.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map((n, i) => `
+                <div class="note-card">
+                    <div class="title">${i+1}. ${escapeHtml(n.title)}</div>
+                    <div class="meta">
+                        <span class="category">${n.category}</span>
+                        <span class="priority">${n.priority}</span>
+                        ${n.synced ? '<span style="color:#2e7d32;"><i class="fas fa-check-circle"></i> Synced</span>' : ''}
+                    </div>
+                    <div class="body">${escapeHtml(n.note)}</div>
+                    <div class="timestamps">
+                        <i class="far fa-calendar-alt"></i> ${new Date(n.dateCreated).toLocaleString()}
+                        ${n.dateCreated !== n.lastEdited ? ` · <i class="fas fa-edit"></i> ${new Date(n.lastEdited).toLocaleString()}` : ''}
+                    </div>
+                    <div class="actions">
+                        <button class="btn-edit" onclick="editNote('${n.id}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" onclick="deleteNote('${n.id}')"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================================
+        // ESCAPE HTML (Security)
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================================
+        // SYNC TO FIRESTORE
+        // ============================================================
+        async function syncNow() {
+            if (!navigator.onLine) {
+                alert("You are offline. Connect to the internet and try again.");
+                return;
+            }
+
+            let notes = getNotes();
+            let queue = getSyncQueue();
+
+            if (queue.length === 0) {
+                alert("All notes are already synced.");
+                return;
+            }
+
+            let btn = document.querySelector('.btn-sync');
+            let originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+            btn.disabled = true;
+
+            let success = 0;
+            let failed = 0;
+
+            for (let id of queue) {
+                let note = notes.find(n => n.id === id);
+                if (!note) continue;
+
+                try {
+                    await db.collection("randomNotes").doc(id).set(note);
+                    note.synced = true;
+                    success++;
+                } catch (err) {
+                    console.error("Sync failed for", id, err);
+                    failed++;
+                }
+            }
+
+            saveNotes(notes);
+            saveSyncQueue([]);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            renderNotes();
+
+            if (failed === 0) {
+                alert(`✅ Sync complete! ${success} notes uploaded.`);
+            } else {
+                alert(`⚠️ Sync complete. ${success} succeeded, ${failed} failed. Try again later.`);
+            }
+        }
+
+        // ============================================================
+        // AUTO SYNC ON ONLINE
+        // ============================================================
+        window.addEventListener("online", function() {
+            let queue = getSyncQueue();
+            if (queue.length > 0) {
+                syncNow();
+            }
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        updateOfflineStatus();
+        renderNotes();
+
+        console.log('📝 BMD Random Notes initialized');
+        console.log('📊 Total notes:', getNotes().length);
+        console.log('🔄 Sync queue:', getSyncQueue().length);
+    </script>
+
+</body>
+</html>
