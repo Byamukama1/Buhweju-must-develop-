@@ -495,6 +495,24 @@
         <button class="btn btn-primary" id="toggleFormBtn"><i class="fas fa-plus-circle"></i> New Entry</button>
         <button class="btn btn-success" id="exportBtn"><i class="fas fa-file-export"></i> Export</button>
         <button class="btn btn-outline" id="syncBtn"><i class="fas fa-cloud-upload-alt"></i> Sync</button>
+
+   <style>
+#randomBtn {
+    background-color: #28a745;
+    border: 1px solid #28a745;
+    color: white;
+}
+
+#randomBtn:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+</style>
+
+<button class="btn" id="randomBtn">
+    <i class="fas fa-random"></i> Random note
+</button>
+
     </div>
 
     <!-- ===== FORM ===== -->
@@ -1234,5 +1252,12 @@ async function loadFromFirestore() {
 
         console.log('📋 BMD Notebook ready – built for Buhweju Must Develop');
     </script>
+
+  <script>
+document.getElementById("randomBtn").addEventListener("click", function () {
+    window.location.href = "randomnote.html";
+});
+</script>
+
 </body>
 </html>
